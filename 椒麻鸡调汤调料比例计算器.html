@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>椒麻鸡调汤调料比例计算器</title>
+<style>
+  @font-face {
+    font-family: 'system-serif';
+    src: local("Noto Serif SC"), local("Songti SC"), local("SimSun");
+  }
+  :root {
+    --ink:      #1a1310;
+    --ink-2:    #241b16;
+    --card:     #2c2019;
+    --card-line:#3d2c22;
+    --paper:    #f4e9d8;
+    --paper-dim:#c9b8a3;
+    --chili:    #c8402c;
+    --chili-lt: #e2603f;
+    --gold:     #d4a13d;
+    --gold-lt:  #e8c375;
+    --green:    #7c8b5a;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 16px 64px;
+    background:
+      radial-gradient(circle at 20% -10%, rgba(200,64,44,0.18), transparent 45%),
+      radial-gradient(circle at 100% 10%, rgba(212,161,61,0.10), transparent 40%),
+      var(--ink);
+  }
+  .wrap {
+    width: 100%;
+    max-width: 460px;
+  }
+
+  /* ---------- Header ---------- */
+  .header {
+    text-align: center;
+    margin-bottom: 34px;
+    position: relative;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--gold-lt);
+    margin-bottom: 14px;
+  }
+  .eyebrow .line {
+    width: 26px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.6;
+  }
+  h1 {
+    font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, var(--paper) 20%, var(--gold-lt) 120%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sub {
+    font-size: 13px;
+    color: var(--paper-dim);
+    letter-spacing: 1px;
+  }
+  .sub b { color: var(--gold-lt); font-weight: 600; }
+
+  /* decorative pepper flourish */
+  .flourish {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 18px;
+    color: var(--chili-lt);
+    opacity: 0.8;
+  }
+  .flourish svg { width: 16px; height: 16px; }
+  .flourish .dash {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--chili), transparent);
+  }
+
+  /* ---------- Input card ---------- */
+  .panel {
+    background: linear-gradient(180deg, var(--card), var(--ink-2));
+    border: 1px solid var(--card-line);
+    border-radius: 18px;
+    padding: 22px 22px 20px;
+    margin-bottom: 22px;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .panel-label {
+    font-size: 13px;
+    color: var(--gold-lt);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .panel-label::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--chili);
+  }
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--card-line);
+    border-radius: 12px;
+    padding: 8px 8px 8px 16px;
+    transition: border-color 0.2s;
+  }
+  .input-row:focus-within {
+    border-color: var(--gold);
+  }
+  input[type="number"] {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: "SF Mono", "Consolas", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--paper);
+    padding: 8px 0;
+  }
+  input[type="number"]::placeholder { color: var(--paper-dim); font-weight: 400; }
+  .unit-tag {
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--gold-lt);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .quick-btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .quick-btns button {
+    flex: 1;
+    min-width: 56px;
+    padding: 9px 0;
+    border: 1px solid var(--card-line);
+    background: rgba(255,255,255,0.02);
+    color: var(--paper-dim);
+    border-radius: 9px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .quick-btns button:hover {
+    background: var(--chili);
+    color: #fff;
+    border-color: var(--chili);
+  }
+  .quick-btns button.active {
+    background: var(--gold);
+    color: var(--ink);
+    border-color: var(--gold);
+    font-weight: 700;
+  }
+
+  /* ---------- Results ---------- */
+  .results-label {
+    font-size: 13px;
+    color: var(--gold-lt);
+    letter-spacing: 1px;
+    margin: 0 4px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .results-label::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--chili);
+  }
+  .result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, var(--card), var(--ink-2));
+    border: 1px solid var(--card-line);
+    border-radius: 12px;
+    padding: 14px 18px;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .result-item:hover {
+    border-color: var(--gold);
+    transform: translateX(2px);
+  }
+  .item-left { display: flex; align-items: center; gap: 12px; }
+  .swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .name-block .name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--paper);
+  }
+  .name-block .ratio {
+    font-size: 11px;
+    color: var(--paper-dim);
+    margin-top: 2px;
+  }
+  .value {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--gold-lt);
+    white-space: nowrap;
+  }
+  .value span {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--paper-dim);
+    margin-left: 3px;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--paper-dim);
+    margin-top: 28px;
+    letter-spacing: 0.5px;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 380px) {
+    h1 { font-size: 25px; }
+    .value { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="eyebrow"><span class="line"></span>秘制汤底 · 精准配比<span class="line"></span></div>
+    <h1>椒麻鸡调汤调料比例计算器</h1>
+    <div class="sub">标准配比：每 <b>1 斤水（500克）</b> 对应各调料用量</div>
+    <div class="flourish">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2c-1 3-1 5 1 6-2 1-3 3-2 6 1-1 3-2 4-4 1 3 0 6-3 8 4 0 7-3 7-7 0-5-4-9-7-9z" fill="currentColor"/></svg>
+      <span class="dash"></span>
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+      <span class="dash"></span>
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2c-1 3-1 5 1 6-2 1-3 3-2 6 1-1 3-2 4-4 1 3 0 6-3 8 4 0 7-3 7-7 0-5-4-9-7-9z" fill="currentColor" transform="scale(-1,1) translate(-24,0)"/></svg>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">水的用量</div>
+    <div class="input-row">
+      <input type="number" id="waterInput" placeholder="请输入斤数" value="1" min="0" step="any">
+      <div class="unit-tag">斤</div>
+    </div>
+    <div class="quick-btns" id="quickBtns">
+      <button data-val="1">1斤</button>
+      <button data-val="5">5斤</button>
+      <button data-val="10">10斤</button>
+      <button data-val="20">20斤</button>
+      <button data-val="50">50斤</button>
+    </div>
+  </div>
+
+  <div class="results-label">调料用量</div>
+  <div class="result-list" id="resultList"></div>
+
+  <footer>1 斤 = 500 克 · 支持输入小数，如 2.5</footer>
+</div>
+
+<script>
+  const seasonings = [
+    { name: "盐",     amount: 10,   color: "#e8e2d0" },
+    { name: "香膏",   amount: 1.8,  color: "#d4a13d" },
+    { name: "糖",     amount: 1.08, color: "#e2603f" },
+    { name: "味精",   amount: 10.8, color: "#7c8b5a" },
+    { name: "鸡精",   amount: 6.5,  color: "#c8402c" },
+    { name: "复合粉", amount: 5.6,  color: "#a8763f" },
+    { name: "麦芽酚", amount: 1.4,  color: "#e8c375" }
+  ];
+
+  const waterInput = document.getElementById('waterInput');
+  const resultList = document.getElementById('resultList');
+  const quickBtns = document.getElementById('quickBtns');
+
+  function formatNum(n) {
+    return parseFloat(n.toFixed(2)).toString();
+  }
+
+  function render() {
+    const water = parseFloat(waterInput.value) || 0;
+    resultList.innerHTML = '';
+
+    seasonings.forEach(item => {
+      const total = item.amount * water;
+      const row = document.createElement('div');
+      row.className = 'result-item';
+      row.innerHTML = `
+        <div class="item-left">
+          <span class="swatch" style="background:${item.color}"></span>
+          <div class="name-block">
+            <div class="name">${item.name}</div>
+            <div class="ratio">每斤水 ${item.amount} 克</div>
+          </div>
+        </div>
+        <div class="value">${formatNum(total)}<span>克</span></div>
+      `;
+      resultList.appendChild(row);
+    });
+
+    // sync active quick button
+    [...quickBtns.children].forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.dataset.val) === water);
+    });
+  }
+
+  quickBtns.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    waterInput.value = btn.dataset.val;
+    render();
+  });
+
+  waterInput.addEventListener('input', render);
+  render();
+</script>
+</body>
+</html>
